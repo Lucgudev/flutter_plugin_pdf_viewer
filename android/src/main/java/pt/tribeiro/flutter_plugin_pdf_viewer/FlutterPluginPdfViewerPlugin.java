@@ -66,12 +66,16 @@ public class FlutterPluginPdfViewerPlugin implements MethodCallHandler {
                                 break;
                             case "getPage":
                                 final String pageResult = getPage((String) call.argument("filePath"), (int) call.argument("pageNumber"));
-                                mainThreadHandler.post(new Runnable(){
-                                    @Override
-                                    public void run() {
-                                        result.success(pageResult);
-                                    }
-                                });
+                                if(pageResult == null) {
+                                    result.notImplemented();
+                                } else {
+                                    mainThreadHandler.post(new Runnable(){
+                                        @Override
+                                        public void run() {
+                                            result.success(pageResult);
+                                        }
+                                    });
+                                }
                                 break;
                             default:
                                 result.notImplemented();
@@ -142,8 +146,6 @@ public class FlutterPluginPdfViewerPlugin implements MethodCallHandler {
             } finally {
                 // close the page
                 page.close();
-                // close the renderer
-                renderer.close();
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
